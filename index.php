@@ -6,9 +6,6 @@ require 'config/config.php';
 require 'vendor/autoload.php';
 require 'lib/F3Auth.php';
 
-$a - 4;
-
-
 $f3 = \Base::instance();
 
 $f3->route('GET /hello',
