@@ -1,0 +1,7 @@
+{
+  "require": {
+      "bcosca/fatfree": "^3.8",
+      "respect/validation": "^2.2",
+      "wrdickson/apitest":"dev-master"
+  }
+}
