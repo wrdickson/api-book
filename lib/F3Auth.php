@@ -11,7 +11,7 @@ Class F3Auth {
    * @param $f3 object the Fat-Free-Framework base instance
    * @param $perm_required array an array with 'permission' and 'role' as members
    * 
-   * @return array with 'jwt', 'auth', and 'request' as members
+   * @return array 'auth' array
    */
   public static function authorize_token ( $f3, $perm_required ) {
     //  throws a 500 error if 'Jwt' is not in headers

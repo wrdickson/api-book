@@ -21,7 +21,7 @@ require 'route_fragments/auth.php';
 //  handles RootSpaces & Root Space
 require 'route_fragments/root_spaces.php';
 
-
-
+//  handles Reservations
+require 'route_fragments/reservations.php';
 
 $f3->run();
