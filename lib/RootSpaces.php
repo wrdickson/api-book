@@ -1,8 +1,13 @@
 <?php
+
+namespace wrdickson\apibook;
+
+use \PDO;
+
 Class RootSpaces {
 
   public static function createRootSpace ($title, $childOf, $displayOrder, $showChildren, $spaceType, $people, $beds) {
-    $pdo = Data_Connecter::get_connection();
+    $pdo = DataConnecter::get_connection();
     $stmt = $pdo->prepare("INSERT INTO root_spaces (title, child_of, display_order, show_children, space_type, people, beds) VALUES (:t, :co, :do, :sc, :st, :p, :b)");
     $stmt->bindParam(":t", $title);
     $stmt->bindParam(":co", $childOf);
@@ -13,30 +18,33 @@ Class RootSpaces {
     $stmt->bindParam(":b", $beds);
     $execute = $stmt->execute();
     $id = $pdo->lastInsertId();
+    $pdo = null;
     return $id;
   }
 
   public static function deleteRootSpace ($rootSpaceId) {
-    $pdo = Data_Connecter::get_connection();
+    $pdo = DataConnector::get_connection();
     $stmt = $pdo->prepare("DELETE FROM root_spaces WHERE id = :rsi");
     $stmt->bindParam(":rsi", $rootSpaceId);
     $execute = $stmt->execute();
+    $pdo = null;
     return $execute;
   }
 
   public static function get_all_space_ids(){
-    $pdo= Data_Connecter::get_connection();
+    $pdo= DataConnector::get_connection();
     $stmt = $pdo->prepare("SELECT id FROM root_spaces");
     $stmt->execute();
     $cArr = array();
     while( $obj = $stmt->fetch(PDO::FETCH_OBJ)){
       array_push($cArr, $obj->id);
-    } 
+    }
+    $pdo = null;
     return $cArr;
   }
 
-  public static function getRootSpaces () {
-    $pdo = Data_Connecter::get_connection();
+  public static function get_root_spaces () {
+    $pdo = DataConnector::get_connection();
     $stmt = $pdo->prepare("SELECT * FROM root_spaces ORDER BY display_order ASC");
     $execute = $stmt->execute();
     $returnArr = array();
@@ -52,18 +60,19 @@ Class RootSpaces {
       $iArr['beds'] = $iObj->beds;
       array_push($returnArr, $iArr);
     }
-    return $returnArr;
+    $pdo = null;
+    return (array) $returnArr;
   }
 
-  public static function getRootSpaceChildren($rootSpaceId){
-    //  recursive getChildren()
-    if( !function_exists('getChildren') ){
-      function getChildren($spaceId, $rootSpaces) {
+  public static function get_root_space_children( $rootSpaceId ){
+    //  recursive get_children()
+    if( !function_exists('wrdickson\apibook\get_children') ){
+      function get_children($spaceId, $rootSpaces) {
         $children = [];
         foreach($rootSpaces as $space){
           if ($space['childOf'] == $spaceId) {
             //  recursive:
-            $c = getChildren($space['id'], $rootSpaces);
+            $c = get_children($space['id'], $rootSpaces);
             array_push($children, $space['id']);
             $children = array_merge($children, $c);
           }
@@ -71,18 +80,16 @@ Class RootSpaces {
         return $children;
       }
     }
-
     //  get the root spaces . . .
-    $rootSpaces = RootSpaces::getRootSpaces();
-
-    $children = getChildren($rootSpaceId, $rootSpaces);
+    $rootSpaces = RootSpaces::get_root_spaces();
+    $children = get_children($rootSpaceId, $rootSpaces);
     return $children;
   }
 
-  public static function getRootSpaceParents ( $rootSpaceId ) {
+  public static function get_root_space_parents( $rootSpaceId ) {
 
     //  recursive getParents()
-    if( !function_exists('getParents') ){
+    if( !function_exists('wrdickson\apibook\getParents') ){
       function getParents($rootSpaceId, $rootSpaces) {
         $parents = [];
         foreach($rootSpaces as $rootSpace) {
@@ -97,13 +104,10 @@ Class RootSpaces {
         return $parents;
       }
     }
-
     //  get the root spaces . . .
-    $rootSpaces = RootSpaces::getRootSpaces();
-
+    $rootSpaces = RootSpaces::get_root_spaces();
     $parents = getParents($rootSpaceId, $rootSpaces);
     return $parents;
-
   }
 
   public static function updateRootSpace ($id, $title, $childOf, $displayOrder, $showChildren, $spaceType, $people, $beds) {
@@ -118,7 +122,7 @@ Class RootSpaces {
     *    return an error
     */
 
-    $pdo = Data_Connecter::get_connection();
+    $pdo = DataConnector::get_connection();
     $stmt = $pdo->prepare("UPDATE root_spaces SET title = :t, display_order = :d, child_of = :c, show_children = :s, space_type = :st, people= :p, beds = :b WHERE id = :i");
     $stmt->bindParam(":i", $id);
     $stmt->bindParam(":t", $title);

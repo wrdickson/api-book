@@ -27,6 +27,7 @@ Class RootSpace {
       $this->people = $obj->people;
       $this->beds = $obj->beds;
     }
+    $pdo = null;
   }
 
   public function update_subspaces () {

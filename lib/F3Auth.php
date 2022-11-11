@@ -22,10 +22,10 @@ Class F3Auth {
     if( $auth && $auth['status'] == 200 ) {
       //  authenticate passed . . . 
       $r = array();
-      $r['jwt'] = $f3['HEADERS']['Jwt'];
+      //$r['jwt'] = $f3['HEADERS']['Jwt'];
       $r['auth'] = $auth;
-      $r['request'] = $f3['REQUEST'];
-      return $r;
+      //$r['request'] = $f3['REQUEST'];
+      return $auth;
     } else {
       if( $auth['status'] ) {
         $f3->error( $auth['status'] );
