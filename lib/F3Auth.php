@@ -6,12 +6,13 @@ use wrdickson\apitest\Auth;
 
 Class F3Auth {
   /**
-   * 
+   * authorize a token provided as 'Jwt' in header and return the user or throw an error
    * 
    * @param $f3 object the Fat-Free-Framework base instance
    * @param $perm_required array an array with 'permission' and 'role' as members
    * 
-   * @return array 'auth' array
+   * @return array 'auth' array with an 'account' array containing user info
+   * @return ERROR will throw an request error: 401, 402, 403, 500 if token fails
    */
   public static function authorize_token ( $f3, $perm_required ) {
     //  throws a 500 error if 'Jwt' is not in headers
@@ -22,9 +23,7 @@ Class F3Auth {
     if( $auth && $auth['status'] == 200 ) {
       //  authenticate passed . . . 
       $r = array();
-      //$r['jwt'] = $f3['HEADERS']['Jwt'];
       $r['auth'] = $auth;
-      //$r['request'] = $f3['REQUEST'];
       return $auth;
     } else {
       if( $auth['status'] ) {

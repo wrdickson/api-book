@@ -3,6 +3,7 @@
 namespace wrdickson\apitest;
 
 use \PDO;
+use \PDOException;
 use \DateTimeImmutable;
 use \Firebase\JWT\JWT;
 use \Firebase\JWT\Key;
@@ -68,7 +69,6 @@ Class Auth {
       $authenticate_status = 400;
     } else {
       try{
-        //  const JWT_KEY is defined in config
         $authenticate_decoded = JWT::decode( $token, new Key( $this->jwt_key, 'HS256') );
         //  check that the user has the permission level
         //  OR has the role 

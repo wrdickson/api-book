@@ -2,6 +2,8 @@
 
 namespace wrdickson\apibook;
 
+use \PDO;
+
 Class RootSpace {
 
   private $id;
@@ -14,7 +16,7 @@ Class RootSpace {
 
 
   public function __construct($root_space_id){
-    $pdo = Data_Connecter::get_connection();
+    $pdo = DataConnector::get_connection();
     $stmt = $pdo->prepare("SELECT * FROM root_spaces WHERE id = :id");
     $stmt->bindParam(":id", $root_space_id, PDO::PARAM_INT);
     $stmt->execute();
@@ -32,7 +34,7 @@ Class RootSpace {
 
   public function update_subspaces () {
     //  calculate children . . . 
-    $children = RootSpaces::getRootSpaceChildren($this->id);
+    $children = RootSpaces::get_root_space_children($this->id);
     return $children;
   }
 

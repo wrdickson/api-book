@@ -38,9 +38,6 @@ Class Customer {
   }
   
   public static function addCustomer($lastName, $firstName, $address1, $address2, $city, $region, $country, $postalCode, $phone, $email){
-    
-    //todo validate parameters
-    
     $pdo = DataConnector::get_connection();
     $stmt = $pdo->prepare("INSERT INTO customers (lastName, firstName, address1, address2, city, region, country, postalCode, phone, email) VALUES (:ln, :fn, :a1, :a2, :ci, :re, :co, :pc, :ph, :em)");
     $stmt->bindParam(":ln", $lastName, PDO::PARAM_STR);
@@ -58,7 +55,7 @@ Class Customer {
     return $insertId;
   }
   
-  function dumpArray(){
+  public function dumpArray(){
     $arr = array();
     $arr['id'] = $this->id;
     $arr['lastName'] = $this->lastName;
@@ -97,7 +94,7 @@ Class Customer {
     return $cArr;
   }
   
-  public static function searchCustomers($lastName, $firstName){
+  public static function searchCustomers( $lastName, $firstName ){
     $last = $lastName . "%";
     $first = $firstName ."%";
     $pdo = DataConnector::get_connection();

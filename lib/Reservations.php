@@ -6,7 +6,7 @@ use \PDO;
 
 Class Reservations {
 
-public static function checkAvailabilityByDates($start, $end){
+public static function check_availability_by_dates( $start, $end ){
   $response = array();
   $pdo = DataConnector::get_connection();
   //first, get all reservations that conflict with those dates
@@ -41,7 +41,7 @@ public static function checkAvailabilityByDates($start, $end){
   //  2. if one of the children is in a reservation space code, remove it 
   foreach( $availableSpaceIds as $index => $spaceId ) {
     //  run the recursive function to get the space's children
-    $children = RootSpaces::getRootSpaceChildren($spaceId);
+    $children = RootSpaces::get_root_space_children($spaceId);
     //  iterate through the children
     foreach($children as $childSpaceId){
       //  compare to the array we made above to include all space codes in res
@@ -91,7 +91,7 @@ public static function checkAvailabilityByDatesIgnoreRes($start, $end, $resId){
   //  2. if one of the children is in a reservation space code, remove it 
   foreach( $availableSpaceIds as $index => $spaceId ) {
     //  run the recursive function to get the space's children
-    $children = RootSpaces::getRootSpaceChildren($spaceId);
+    $children = RootSpaces::get_root_space_children($spaceId);
     //  iterate through the children
     foreach($children as $childSpaceId){
       //  compare to the array we made above to include all space codes in res
@@ -136,7 +136,7 @@ public static function checkConflictsByIdDate($start, $end, $spaceId ){
     };
   }
 
-  public static function getReservationsDateRange($startDate, $endDate){
+  public static function get_reservations_date_range( $startDate, $endDate ){
     $pdo = DataConnector::get_connection();
     $stmt = $pdo->prepare("SELECT * FROM reservations WHERE checkout >= :start AND checkin <= :end");
     $stmt->bindParam(':start', $startDate);

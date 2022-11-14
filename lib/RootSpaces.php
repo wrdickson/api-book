@@ -7,7 +7,7 @@ use \PDO;
 Class RootSpaces {
 
   public static function createRootSpace ($title, $childOf, $displayOrder, $showChildren, $spaceType, $people, $beds) {
-    $pdo = DataConnecter::get_connection();
+    $pdo = DataConnector::get_connection();
     $stmt = $pdo->prepare("INSERT INTO root_spaces (title, child_of, display_order, show_children, space_type, people, beds) VALUES (:t, :co, :do, :sc, :st, :p, :b)");
     $stmt->bindParam(":t", $title);
     $stmt->bindParam(":co", $childOf);

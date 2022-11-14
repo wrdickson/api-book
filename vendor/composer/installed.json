@@ -268,17 +268,17 @@
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.26.0",
-            "version_normalized": "1.26.0.0",
+            "version": "v1.27.0",
+            "version_normalized": "1.27.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "9344f9cb97f3b19424af1a21a3b0e75b0a7d8d7e"
+                "reference": "8ad114f6b39e2c98a8b0e3bd907732c207c2b534"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/9344f9cb97f3b19424af1a21a3b0e75b0a7d8d7e",
-                "reference": "9344f9cb97f3b19424af1a21a3b0e75b0a7d8d7e",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/8ad114f6b39e2c98a8b0e3bd907732c207c2b534",
+                "reference": "8ad114f6b39e2c98a8b0e3bd907732c207c2b534",
                 "shasum": ""
             },
             "require": {
@@ -290,11 +290,11 @@
             "suggest": {
                 "ext-mbstring": "For best performance"
             },
-            "time": "2022-05-24T11:49:31+00:00",
+            "time": "2022-11-03T14:55:06+00:00",
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "1.26-dev"
+                    "dev-main": "1.27-dev"
                 },
                 "thanks": {
                     "name": "symfony/polyfill",
@@ -334,7 +334,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.26.0"
+                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.27.0"
             },
             "funding": [
                 {
@@ -359,19 +359,19 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/wrdickson/api-composer-test.git",
-                "reference": "0622365d10a5a7125101c8e4561c20af020c05c8"
+                "reference": "745b81b146df05bc5ea0f547ae36ac75bd4eb448"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wrdickson/api-composer-test/zipball/0622365d10a5a7125101c8e4561c20af020c05c8",
-                "reference": "0622365d10a5a7125101c8e4561c20af020c05c8",
+                "url": "https://api.github.com/repos/wrdickson/api-composer-test/zipball/745b81b146df05bc5ea0f547ae36ac75bd4eb448",
+                "reference": "745b81b146df05bc5ea0f547ae36ac75bd4eb448",
                 "shasum": ""
             },
             "require": {
                 "firebase/php-jwt": "^6.3",
                 "php": ">=5.3.0"
             },
-            "time": "2022-11-09T00:31:23+00:00",
+            "time": "2022-11-11T05:13:16+00:00",
             "default-branch": true,
             "type": "library",
             "installation-source": "dist",

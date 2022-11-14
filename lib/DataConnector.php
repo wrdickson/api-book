@@ -3,10 +3,14 @@
 namespace wrdickson\apibook;
 
 use \PDO;
+use \PDOException;
 
-/*
-class.data_connecter.php
-*/
+/**
+ *  needs these DEFINED variables:
+ *  DB_HOST, DB_NAME, DB_USER, DB_PASS
+ * 
+ * @return PDO
+ */
 class DataConnector {
     public static function get_connection(){
         try {
@@ -21,5 +25,3 @@ class DataConnector {
         }   
     }
 }
-
-
