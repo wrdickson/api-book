@@ -5,6 +5,7 @@ namespace wrdickson\apibook;
 require 'config/config.php';
 require 'vendor/autoload.php';
 require 'lib/DataConnector.php';
+require 'lib/Customer.php';
 require 'lib/F3Auth.php';
 
 $f3 = \Base::instance();
@@ -23,5 +24,8 @@ require 'route_fragments/root_spaces.php';
 
 //  handles Reservations
 require 'route_fragments/reservations.php';
+
+//  handles Customers
+require 'route_fragments/customers.php';
 
 $f3->run();

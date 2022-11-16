@@ -3,7 +3,6 @@
 namespace wrdickson\apibook;
 
 require 'lib/Reservations.php';
-require 'lib/Customer.php';
 
 use wrdickson\apitest\Auth;
 

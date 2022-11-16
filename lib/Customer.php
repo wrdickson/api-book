@@ -94,28 +94,51 @@ Class Customer {
     return $cArr;
   }
   
-  public static function searchCustomers( $lastName, $firstName ){
+  public static function searchCustomers( $lastName, $firstName, $offset, $limit ){
     $last = $lastName . "%";
     $first = $firstName ."%";
     $pdo = DataConnector::get_connection();
     //are lastName and firstName both > 1?
     if( strlen($last) > 1 && strlen($first) > 1 ){
-      $stmt = $pdo->prepare("SELECT * FROM customers WHERE lastName LIKE :last AND firstName LIKE :first ORDER BY lastName, firstName ASC" );
+      $stmt = $pdo->prepare("SELECT * FROM customers WHERE lastName LIKE :last AND firstName LIKE :first ORDER BY lastName, firstName ASC LIMIT :offset, :limit" );
       $stmt->bindParam(":last",$last,PDO::PARAM_STR);
       $stmt->bindParam(":first",$first,PDO::PARAM_STR);
-    //is lastName >1 while firstName = 1?
-    } elseif ( strlen($last) > 1 && strlen($first) == 1 ){
-      $stmt = $pdo->prepare("SELECT * FROM customers WHERE lastName LIKE :last ORDER BY lastName, firstName ASC");
+      $stmt->bindParam(":offset", $offset);
+      $stmt->bindParam(":limit", $limit);
+      //  count
+      $stmt_count = $pdo->prepare("SELECT * FROM customers WHERE lastName LIKE :last AND firstName LIKE :first");
+      $stmt_count->bindParam(":last",$last,PDO::PARAM_STR);
+      $stmt_count->bindParam(":first",$first,PDO::PARAM_STR);
+
+    //is lastName >1 while firstName = 0?
+    } elseif ( strlen($last) > 1 && strlen($first) == 0 ){
+      $stmt = $pdo->prepare("SELECT * FROM customers WHERE lastName LIKE :last ORDER BY lastName, firstName ASC LIMIT :offset, :limit");
       $stmt->bindParam(":last",$last,PDO::PARAM_STR);
-    //is firstName > 1 and lastName = 1?
-    } elseif ( strlen($first) > 1 && strlen($last) == 1 ){
-      $stmt = $pdo->prepare("SELECT * FROM customers WHERE firstName LIKE :first ORDER BY lastName, firstName ASC");
+      $stmt->bindParam(":offset", $offset);
+      $stmt->bindParam(":limit", $limit);
+      //  count
+      $stmt_count = $pdo->prepare("SELECT * FROM customers WHERE lastName LIKE :last");
+      $stmt_count->bindParam(":last", $last);
+    //is firstName > 1 and lastName = 0?
+    } elseif ( strlen($first) > 1 && strlen($last) == 0 ){
+      $stmt = $pdo->prepare("SELECT * FROM customers WHERE firstName LIKE :first ORDER BY lastName, firstName ASC LIMIT :offset, :limit");
       $stmt->bindParam(":first",$first,PDO::PARAM_STR);
-    //first and last are both 1 (ie empty)
+      $stmt->bindParam(":offset", $offset);
+      $stmt->bindParam(":limit", $limit);
+      //  count
+      $stmt_count = $pdo->prepare("SELECT * FROM customers WHERE firstName LIKE :first");
+      $stmt_count->bindParam(":first", $first);
+    //first and last are both 0 (ie empty)
     } else {
-      $stmt = $pdo->prepare("SELECT * FROM customers WHERE lastName LIKE :last AND firstName LIKE :first ORDER BY lastName, firstName ASC");
+      $stmt = $pdo->prepare("SELECT * FROM customers WHERE lastName LIKE :last AND firstName LIKE :first ORDER BY lastName, firstName ASC LIMIT :offset,:limit");
       $stmt->bindParam(":last",$last,PDO::PARAM_STR);
-      $stmt->bindParam(":first",$first,PDO::PARAM_STR);      
+      $stmt->bindParam(":first",$first,PDO::PARAM_STR);
+      $stmt->bindParam(":offset", $offset, PDO::PARAM_INT);
+      $stmt->bindParam(":limit", $limit, PDO::PARAM_INT);
+      //  count
+      $stmt_count = $pdo->prepare("SELECT * FROM customers WHERE lastName LIKE :last AND firstName LIKE :first");
+      $stmt_count->bindParam(":last",$last,PDO::PARAM_STR);
+      $stmt_count->bindParam(":first",$first,PDO::PARAM_STR);
     }
     $stmt->execute();
     $cArr = array();
@@ -123,7 +146,10 @@ Class Customer {
       $iCust = new Customer($obj->id);
       array_push($cArr, $iCust->dumpArray());
     }
-    return $cArr;
+    $result['customers'] = $cArr;
+    $ex_count = $stmt_count->execute();
+    $result['count'] = $stmt_count->rowCount();
+    return $result;
   }
   
   public function update(){
