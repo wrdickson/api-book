@@ -3,10 +3,18 @@
 namespace wrdickson\apibook;
 
 require 'config/config.php';
-require 'vendor/autoload.php';
 require 'lib/DataConnector.php';
+require 'lib/Reservations.php';
+require 'lib/Reservation.php';
+require 'lib/Folios.php';
+require 'lib/Folio.php';
 require 'lib/Customer.php';
+require 'lib/Account.php';
 require 'lib/F3Auth.php';
+require 'lib/RootSpaces.php';
+require 'lib/RootSpace.php';
+
+require 'vendor/autoload.php';
 
 $f3 = \Base::instance();
 

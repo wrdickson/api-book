@@ -17,6 +17,7 @@ Class F3Auth {
   public static function authorize_token ( $f3, $perm_required ) {
     //  throws a 500 error if 'Jwt' is not in headers
     $token = $f3['HEADERS']['Jwt'];
+    //$token = 'eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTY2ODY0NTI2OSwiaWF0IjoxNjY4NjQ1MjY5fQ.Yt_IbOTlhJHQEKNp4ldw_ykCsxEPa7kNT3Ombiq63WE';
     $iAuth = new Auth( SERVER_NAME, JWT_KEY, DB_HOST, DB_NAME, DB_USER, DB_PASS);
     $auth = $iAuth->authenticate( $perm_required, $token );
     //  throw an error if authenticate() fails OR if response code > 399

@@ -2,12 +2,9 @@
 
 namespace wrdickson\apibook;
 
-require 'lib/RootSpaces.php';
-require 'lib/RootSpace.php';
-
 $f3->route('POST /root-spaces', function ( $f3 ) {
   $perms = [ 'permission' => 1, 'role' => 'get_root_spaces' ];
-  //  the request should have 'jwt' property in header with user's token
+  //  the request should have 'Jwt' property in header with user's token
   //  this throws an error if the token doesn't work OR user doesn't have permission
   $f3auth = F3Auth::authorize_token( $f3, $perms );
   

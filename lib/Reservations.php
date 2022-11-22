@@ -3,6 +3,7 @@
 namespace wrdickson\apibook;
 
 use \PDO;
+use \Exception;
 
 Class Reservations {
 
@@ -106,7 +107,7 @@ public static function checkAvailabilityByDatesIgnoreRes($start, $end, $resId){
 }
 
 
-public static function checkConflictsByIdDate($start, $end, $spaceId ){
+public static function check_conflicts( $start, $end, $space_id ){
     $pdo = DataConnector::get_connection();
     //works, note the comparators are "<" and ">", not "<=" and ">=" because
     //we do allow overlap in sense that one person can checkout on the same
@@ -115,7 +116,7 @@ public static function checkConflictsByIdDate($start, $end, $spaceId ){
     $stmt = $pdo->prepare("SELECT * FROM `reservations` WHERE FIND_IN_SET( :spaceId, space_code ) > 0 AND ( :start < `checkout` AND :end > `checkin`  )");
     $stmt->bindParam(":start", $start, PDO::PARAM_STR);
     $stmt->bindParam(":end", $end, PDO::PARAM_STR);
-    $stmt->bindParam(":spaceId", $spaceId, PDO::PARAM_INT);
+    $stmt->bindParam(":spaceId", $space_id, PDO::PARAM_INT);
     $success = $stmt->execute();
     $pdoError = $pdo->errorInfo();
     $response['success'] = $success;
@@ -134,6 +135,51 @@ public static function checkConflictsByIdDate($start, $end, $spaceId ){
     } else {
         return true;
     };
+  }
+
+  public static function createReservation( $checkin, $checkout, $customer, $spaceId, $people, $beds ){
+    $response = array();
+    //  TODO make damn sure there is not a comflict
+
+    //  generate the space code
+    $childrenArr = RootSpaces::get_root_space_children( $spaceId );
+    if(count($childrenArr) > 0){
+      $spaceCode = $spaceId . ',' . implode(',',$childrenArr);
+    } else {
+      $spaceCode = $spaceId;
+    }
+    $response['space_code'] = $spaceCode;
+    try {
+      //  add to db
+      $pdo = DataConnector::get_connection();
+      $pdo->beginTransaction();
+      $stmt = $pdo->prepare("INSERT INTO reservations (space_code, space_id, checkin, checkout, customer, people, beds, folio, history, status, notes) VALUES (:sc, :si, :ci, :co, :cus, :ppl, :bds, '0', '{}', '0', '{}')");
+      $stmt->bindParam(":sc", $spaceCode);
+      $stmt->bindParam(":si", $spaceId);
+      $stmt->bindParam(":ci", $checkin);
+      $stmt->bindParam(":co", $checkout);
+      $stmt->bindParam(":cus", $customer);
+      $stmt->bindParam(":ppl", $people);
+      $stmt->bindParam(":bds", $beds);
+      $execute = $stmt->execute();
+      $resId = $pdo->lastInsertId();
+      $response['execute'] = $execute;
+      $response['newId'] = $resId;
+
+      //  now create the folio
+      $folioId = Folios::create_folio( $resId, $customer );
+
+      $pdo->commit();
+    } catch ( Exception $e ) {
+      $pdo->rollBack();
+    }
+    $newRes = new Reservation($resId);
+    $newRes->folio = $folioId;
+    $newRes->update_to_db();
+    $finalRes = new Reservation($resId);
+    $response['newRes'] = $finalRes->to_array();
+    //  return
+    return $response;
   }
 
   public static function get_reservations_date_range( $startDate, $endDate ){
