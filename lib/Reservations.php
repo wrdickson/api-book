@@ -137,7 +137,7 @@ public static function check_conflicts( $start, $end, $space_id ){
     };
   }
 
-  public static function createReservation( $checkin, $checkout, $customer, $spaceId, $people, $beds ){
+  public static function create_reservation( $checkin, $checkout, $customer, $spaceId, $people, $beds ){
     $response = array();
     //  TODO make damn sure there is not a comflict
 
@@ -173,6 +173,7 @@ public static function check_conflicts( $start, $end, $space_id ){
     } catch ( Exception $e ) {
       $pdo->rollBack();
     }
+
     $newRes = new Reservation($resId);
     $newRes->folio = $folioId;
     $newRes->update_to_db();
@@ -198,7 +199,7 @@ public static function check_conflicts( $start, $end, $space_id ){
         $iArr['checkin'] = $obj->checkin;
         $iArr['checkout'] = $obj->checkout;
         $iArr['customer'] = $obj->customer;
-        $iArr['customer_obj'] = $cust->dumpArray();
+        $iArr['customer_obj'] = $cust->to_array();
         $iArr['people'] = $obj->people;
         $iArr['beds'] = $obj->beds;
         $iArr['folio'] = $obj->folio;

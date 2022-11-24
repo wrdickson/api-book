@@ -3,6 +3,8 @@
 namespace wrdickson\apibook;
 
 use wrdickson\apitest\Auth;
+use \Exception;
+use FFI\Exception as FFIException;
 
 $f3 = \Base::instance();
 
@@ -11,7 +13,29 @@ $f3 = \Base::instance();
  * 
  */
 $f3->route('POST /reservations', function ( $f3 ) {
-  print 'hello';
+  $perms = ['permission' => 2, 'role' => 'create_reservation' ];
+  $f3auth = F3Auth::authorize_token( $f3, $perms);
+
+  $account = $f3auth['decoded']->account;
+  $params = $f3['REQUEST'];
+
+  //  validate params
+
+  $params_valid = true;
+  try {
+  $response['create'] = Reservations::create_reservation( $params['checkin'],
+                                                          $params['checkout'],
+                                                          $params['customer']['id'],
+                                                          $params['space_id'],
+                                                          $params['people'],
+                                                          $params['beds'] );
+  } catch (Exception $e) {
+    $response['e'] = $e;
+  }
+
+  $response['account'] = $account;
+  $response['params'] = $params;
+  print json_encode($response);
 });
 
 $f3->route('POST /reservations/availability', function ( $f3 ) {

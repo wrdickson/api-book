@@ -9,6 +9,7 @@ require 'lib/Reservation.php';
 require 'lib/Folios.php';
 require 'lib/Folio.php';
 require 'lib/Customer.php';
+require 'lib/Customers.php';
 require 'lib/Account.php';
 require 'lib/F3Auth.php';
 require 'lib/RootSpaces.php';

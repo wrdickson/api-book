@@ -42,7 +42,7 @@ Class Reservation{
       $this->notes = json_decode($obj->notes);
       $this->customer = $obj->customer;
       $iCustomer = new Customer($obj->customer);
-      $this->customer_obj = $iCustomer->dumpArray();
+      $this->customer_obj = $iCustomer->to_array();
     }
   }
 
@@ -157,7 +157,7 @@ Class Reservation{
           $r['notes'] = json_decode($obj->notes, true);
           $r['customer'] = $obj->customer;
           $iCustomer = new Customer($obj->customer);
-          $r['customer_obj'] = $iCustomer->dumpArray();
+          $r['customer_obj'] = $iCustomer->to_array();
         }
         $folio = new Folio( $r['folio'] );
         $r['folio_obj'] = $folio->to_array();
