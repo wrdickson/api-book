@@ -3,10 +3,11 @@
 namespace wrdickson\apibook;
 
 use \PDO;
+use \Exception;
 
 Class RootSpaces {
 
-  public static function createRootSpace ($title, $childOf, $displayOrder, $showChildren, $spaceType, $people, $beds) {
+  public static function create_root_space ( $beds, $childOf, $displayOrder, $people, $showChildren, $spaceType, $title ) {
     $pdo = DataConnector::get_connection();
     $stmt = $pdo->prepare("INSERT INTO root_spaces (title, child_of, display_order, show_children, space_type, people, beds) VALUES (:t, :co, :do, :sc, :st, :p, :b)");
     $stmt->bindParam(":t", $title);
@@ -16,13 +17,17 @@ Class RootSpaces {
     $stmt->bindParam(":st", $spaceType);
     $stmt->bindParam(":p", $people);
     $stmt->bindParam(":b", $beds);
-    $execute = $stmt->execute();
-    $id = $pdo->lastInsertId();
+    try{
+      $execute = $stmt->execute();
+      $id = $pdo->lastInsertId();
+    } catch (Exception $ex) {
+      return $ex;
+    }
     $pdo = null;
     return $id;
   }
 
-  public static function deleteRootSpace ($rootSpaceId) {
+  public static function delete_rootS_space ($rootSpaceId) {
     $pdo = DataConnector::get_connection();
     $stmt = $pdo->prepare("DELETE FROM root_spaces WHERE id = :rsi");
     $stmt->bindParam(":rsi", $rootSpaceId);
@@ -110,7 +115,7 @@ Class RootSpaces {
     return $parents;
   }
 
-  public static function updateRootSpace ($id, $title, $childOf, $displayOrder, $showChildren, $spaceType, $people, $beds) {
+  public static function update_root_space ($id, $title, $childOf, $displayOrder, $showChildren, $spaceType, $people, $beds) {
     /* 
     *  what we need to do:
     *  load up the all spaces array

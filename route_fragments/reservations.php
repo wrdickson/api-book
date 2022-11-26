@@ -6,8 +6,6 @@ use wrdickson\apitest\Auth;
 use \Exception;
 use FFI\Exception as FFIException;
 
-$f3 = \Base::instance();
-
 /**
  *  CREATE RESERVATION
  * 
@@ -17,18 +15,18 @@ $f3->route('POST /reservations', function ( $f3 ) {
   $f3auth = F3Auth::authorize_token( $f3, $perms);
 
   $account = $f3auth['decoded']->account;
-  $params = $f3['REQUEST'];
+  $params = json_decode($f3->get('BODY'));
 
   //  validate params
 
   $params_valid = true;
   try {
-  $response['create'] = Reservations::create_reservation( $params['checkin'],
-                                                          $params['checkout'],
-                                                          $params['customer']['id'],
-                                                          $params['space_id'],
-                                                          $params['people'],
-                                                          $params['beds'] );
+  $response['create'] = Reservations::create_reservation( $params->checkin,
+                                                          $params->checkout,
+                                                          $params->customer->id,
+                                                          $params->space_id,
+                                                          $params->people,
+                                                          $params->beds );
   } catch (Exception $e) {
     $response['e'] = $e;
   }
@@ -45,20 +43,23 @@ $f3->route('POST /reservations/availability', function ( $f3 ) {
   $f3auth = F3Auth::authorize_token( $f3, $perms );
 
   $account = $f3auth['decoded']->account;
-  $params = $f3['REQUEST'];
+  $params = json_decode($f3->get('BODY'));
 
   $response['account'] = $account;
   $response['params'] = $params;
-  $response['availability'] = Reservations::check_availability_by_dates( $params['startDate'], $params['endDate'] );
+  $response['availability'] = Reservations::check_availability_by_dates( $params->startDate, $params->endDate );
   print json_encode($response);
 });
 
 $f3->route('POST /reservations/conflicts', function ( $f3 ) {
   $perms = [ 'permission' => 1, 'role' => 'check_conflicts' ];
   $f3auth = F3Auth::authorize_token( $f3, $perms );
-  $start = $f3['REQUEST']['startDate'];
-  $end = $f3['REQUEST']['endDate'];
-  $space_id = $f3['REQUEST']['spaceId'];
+
+  $params = json_decode($f3->get('BODY'));
+
+  $start = $params->startDate;
+  $end = $params->endDate;
+  $space_id = $params->spaceId;
 
   $response['f3auth'] = $f3auth;
   $response['checkConflicts'] = Reservations::check_conflicts( $start, $end, $space_id );
@@ -72,11 +73,13 @@ $f3->route('POST /reservations/range', function( $f3 ) {
   $f3auth = F3Auth::authorize_token( $f3, $perms );
   
   $account = $f3auth['decoded']->account;
-  $params = $f3['REQUEST'];
+  $params = json_decode($f3->get('BODY'));
+
+  //  TODO validate dates??
 
   $response['account'] = $account;
   $response['params'] = $params;
-  $response['reservations'] = Reservations::get_reservations_date_range($params['startDate'], $params['endDate']);
+  $response['reservations'] = Reservations::get_reservations_date_range($params->startDate, $params->endDate);
   print json_encode($response);
 });
 

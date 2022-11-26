@@ -14,6 +14,7 @@ require 'lib/Account.php';
 require 'lib/F3Auth.php';
 require 'lib/RootSpaces.php';
 require 'lib/RootSpace.php';
+require 'lib/SpaceTypes.php';
 
 require 'vendor/autoload.php';
 
@@ -36,5 +37,8 @@ require 'route_fragments/reservations.php';
 
 //  handles Customers
 require 'route_fragments/customers.php';
+
+//  handles SpaceTypes
+require 'route_fragments/space_types.php';
 
 $f3->run();

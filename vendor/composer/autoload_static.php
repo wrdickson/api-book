@@ -6,24 +6,10 @@ namespace Composer\Autoload;
 
 class ComposerStaticInit949c72b50757880246e9b502f2e314e6
 {
-    public static $files = array (
-        '2df68f9e79c919e2d88506611769ed2e' => __DIR__ . '/..' . '/respect/stringifier/src/stringify.php',
-        '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
-    );
-
     public static $prefixLengthsPsr4 = array (
         'w' => 
         array (
             'wrdickson\\apitest\\' => 18,
-        ),
-        'S' => 
-        array (
-            'Symfony\\Polyfill\\Mbstring\\' => 26,
-        ),
-        'R' => 
-        array (
-            'Respect\\Validation\\' => 19,
-            'Respect\\Stringifier\\' => 20,
         ),
         'F' => 
         array (
@@ -35,18 +21,6 @@ class ComposerStaticInit949c72b50757880246e9b502f2e314e6
         'wrdickson\\apitest\\' => 
         array (
             0 => __DIR__ . '/..' . '/wrdickson/apitest/src',
-        ),
-        'Symfony\\Polyfill\\Mbstring\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
-        ),
-        'Respect\\Validation\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/respect/validation/library',
-        ),
-        'Respect\\Stringifier\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/respect/stringifier/src',
         ),
         'Firebase\\JWT\\' => 
         array (
