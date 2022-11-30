@@ -27,7 +27,7 @@ Class RootSpaces {
     return $id;
   }
 
-  public static function delete_rootS_space ($rootSpaceId) {
+  public static function delete_root_space ($rootSpaceId) {
     $pdo = DataConnector::get_connection();
     $stmt = $pdo->prepare("DELETE FROM root_spaces WHERE id = :rsi");
     $stmt->bindParam(":rsi", $rootSpaceId);

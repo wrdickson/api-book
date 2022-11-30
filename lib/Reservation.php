@@ -5,25 +5,80 @@ namespace wrdickson\apibook;
 use \PDO;
 
 Class Reservation{
-  public $id;
-  public $space_id;
-  public $space_code;
-  public $checkin;
-  public $checkout;
-  public $people;
-  public $beds;
-  public $folio;
-  public $folio_obj;
+  // $id int
+  private $id;
+  // $space_id int
+  private $space_id;
+  // $space_code string of ints eg '12,45,16'
+  private $space_code;
+  // $checkin string, formatted date '2022-03-01'
+  private $checkin;
+  // $checkout string, formatted date '2024-01-07'
+  private $checkout;
+  // $people int
+  private $people;
+  // $beds int
+  private $beds;
+  // $folio int
+  private $folio;
+  // folio_obj is a json string
+  private $folio_obj;
   /**
    * Status:
    * 0 - Checked in/ in house
    * 1 - Checked out/ not in house
    */
-  public $status;
-  public $history;
-  public $notes;
-  public $customer;
-  public $customer_obj;
+  private $status;
+  // history is a json string
+  private $history;
+  // notes is a json string
+  private $notes;
+  // customer int
+  private $customer;
+  //  customer_obj is a json string
+  private $customer_obj;
+
+  /**
+   * SETTERS
+   */
+  public function set_space_id ( $space_id ) {
+    //  when we set space id, we also have to generate and set
+    //  a new space_code
+    //  generate the space code
+    $childrenArr = RootSpaces::get_root_space_children( $space_id );
+    if( count( $childrenArr ) > 0 ) {
+      $space_code = $space_id . ',' . implode( ',', $childrenArr );
+    } else {
+      $space_code = $space_id;
+    }
+    $this->space_id = $space_id;
+    $this->space_code = $space_code;
+    return $this->update_to_db();
+  }
+  public function set_checkin ( $checkin ) {
+    $this->checkin = $checkin;
+    return $this->update_to_db();
+  }
+  public function set_checkout ( $checkout ) {
+    $this->checkout = $checkout;
+    return $this->update_to_db();
+  }
+  public function set_people ( $people ) {
+    $this->people = $people;
+    return $this->update_to_db();
+  }
+  public function set_beds ( $beds ) {
+    $this->beds = $beds;
+    return $this->update_to_db();
+  }
+  public function set_folio ( $folio ) {
+    $this->folio = $folio;
+    return $this->update_to_db();
+  }
+  public function set_customer ( $customer ) {
+    $this->customer = $customer;
+    return $this->update_to_db();
+  }
 
   public function __construct($id){
     $pdo = DataConnector::get_connection();
@@ -186,5 +241,51 @@ Class Reservation{
     $error = $stmt->errorInfo(); 
     return $execute;
 
+  }
+
+  /**
+   * GETTERS
+   */
+  public function get_id () {
+    return $this->id;
+  }
+  public function get_space_id () {
+    return $this->space_id;
+  }
+  public function get_space_code () {
+    return $this->space_code;
+  }
+  public function get_checkin () {
+    return $this->checkin;
+  }
+  public function get_checkout () {
+    return $this->checkout;
+  }
+  public function get_beds () {
+    return $this->beds;
+  }
+  public function get_people () {
+    return $this->people;
+  }
+  public function get_folio () {
+    return $this->folio;
+  }
+  public function get_folio_obj () {
+    return $this->folio_obj;
+  }
+  public function get_status () {
+    return $this->status;
+  }
+  public function get_history () {
+    return $this->history;
+  }
+  public function get_notes () {
+    return $this->notes;
+  }
+  public function get_customer () {
+    return $this->customer;
+  }
+  public function get_customer_obj () {
+    return $this->customer_obj;
   }
 }

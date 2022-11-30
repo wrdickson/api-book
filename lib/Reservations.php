@@ -7,7 +7,7 @@ use \Exception;
 
 Class Reservations {
 
-public static function check_availability_by_dates( $start, $end ){
+public static function check_availability_by_dates( $start, $end ) {
   $response = array();
   $pdo = DataConnector::get_connection();
   //first, get all reservations that conflict with those dates
@@ -56,7 +56,7 @@ public static function check_availability_by_dates( $start, $end ){
   return $response;
 }
 
-public static function check_availability_by_dates_ignore_res($start, $end, $res_id){
+public static function check_availability_by_dates_ignore_res( $start, $end, $res_id ) {
   $response = array();
   $pdo = DataConnector::get_connection();
   //first, get all reservations that conflict with those dates
@@ -106,13 +106,13 @@ public static function check_availability_by_dates_ignore_res($start, $end, $res
 }
 
 
-public static function check_conflicts( $start, $end, $space_id ){
+public static function check_conflicts( $start, $end, $space_id ) {
     $pdo = DataConnector::get_connection();
     //works, note the comparators are "<" and ">", not "<=" and ">=" because
     //we do allow overlap in sense that one person can checkout on the same
     //day someone checks in
     //  https://stackoverflow.com/questions/325933/determine-whether-two-date-ranges-overlap
-    $stmt = $pdo->prepare("SELECT * FROM `reservations` WHERE FIND_IN_SET( :spaceId, space_code ) > 0 AND ( :start < `checkout` AND :end > `checkin`  )");
+    $stmt = $pdo->prepare("SELECT * FROM `reservations` WHERE FIND_IN_SET( :spaceId, space_code ) > 0 AND ( :start < `checkout` AND :end > `checkin` )");
     $stmt->bindParam(":start", $start, PDO::PARAM_STR);
     $stmt->bindParam(":end", $end, PDO::PARAM_STR);
     $stmt->bindParam(":spaceId", $space_id, PDO::PARAM_INT);
@@ -120,7 +120,38 @@ public static function check_conflicts( $start, $end, $space_id ){
     $pdoError = $pdo->errorInfo();
     $response['success'] = $success;
     $rArr = array();
-    //todo? handle the case where the space_id doesn't exist
+    // TODO ? handle the case where the space_id doesn't exist
+    while( $obj = $stmt->fetch(PDO::FETCH_OBJ)){
+        $iArr = array();
+        $iArr['id'] = $obj->id;
+        $iArr['space_id'] = $obj->space_id;
+        array_push($rArr, $iArr);
+    };
+    $response['hits'] = $rArr;
+    //return $rArr;
+    if(sizeOf($response['hits']) > 0){
+        return false;
+    } else {
+        return true;
+    };
+  }
+
+  public static function check_conflicts_ignore_res( $start, $end, $space_id, $res_id ) {
+    $pdo = DataConnector::get_connection();
+    //works, note the comparators are "<" and ">", not "<=" and ">=" because
+    //we do allow overlap in sense that one person can checkout on the same
+    //day someone checks in
+    //  https://stackoverflow.com/questions/325933/determine-whether-two-date-ranges-overlap
+    $stmt = $pdo->prepare("SELECT * FROM `reservations` WHERE FIND_IN_SET( :spaceId, space_code ) > 0 AND ( :start < `checkout` AND :end > `checkin`  ) AND id != :id");
+    $stmt->bindParam(":start", $start, PDO::PARAM_STR);
+    $stmt->bindParam(":end", $end, PDO::PARAM_STR);
+    $stmt->bindParam(":spaceId", $space_id, PDO::PARAM_INT);
+    $stmt->bindParam(":id", $res_id, PDO::PARAM_INT);
+    $success = $stmt->execute();
+    $pdoError = $pdo->errorInfo();
+    $response['success'] = $success;
+    $rArr = array();
+    // TODO ? handle the case where the space_id doesn't exist
     while( $obj = $stmt->fetch(PDO::FETCH_OBJ)){
         $iArr = array();
         $iArr['id'] = $obj->id;
@@ -139,7 +170,7 @@ public static function check_conflicts( $start, $end, $space_id ){
   /**
    *  Create Reservation
    */
-  public static function create_reservation( $checkin, $checkout, $customer, $spaceId, $people, $beds ){
+  public static function create_reservation( $checkin, $checkout, $customer, $spaceId, $people, $beds ){ 
     $response = array();
     //  TODO make damn sure there is not a comflict
 

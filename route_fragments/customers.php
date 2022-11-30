@@ -4,7 +4,12 @@ namespace wrdickson\apibook;
 
 $f3 = \Base::instance();
 
-//  Create customer
+/** 
+ * CREATE CUSTOMER
+ * This is hamburger bullshit, we are only creating based on 
+ * firstname ,lastname, phone, and email
+ * TODO fix this shit
+ */
 $f3->route('POST /customers/', function ( $f3 ) {
   $perms = [ 'permission' => 2, 'role' => 'create_customer' ];
   //  the request should have 'jwt' property in header with user's token

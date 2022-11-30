@@ -142,41 +142,71 @@ $f3->route('POST /reservations/', function ( $f3 ) {
   $space_id = $resObj->space_id;
   $res_id = $resObj->res_id;
 
-
   $iRes = new Reservation($res_id);
   $response['rid'] = $res_id;
-  $iRes = new Reservation($res_id);
   $iResArray = $iRes->to_array();
   $response['origResArray'] = $iResArray;
 
-  //  go through the params and see if the properties have changed
-  //  create an array to hold the params that have changed
-  $changed_params = array();
-  //  test the params to see if they have changed
+  $response['error'] = array();
+  $response['success'] = true;
+
+  //  go through the params and see if the properties have changed and
+  //  do the updates. we are only handling changes of checkin, checkout, customer, 
+  //  beds, people & space_id with this function
   //  beds
-  if( $checkin != $iRes->checkin ) {
-    $changed_params['checkin'] = $checkin;
-  }
-  if( $checkout != $iRes->checkout ) {
-    $changed_params['checkout'] = $checkout;
-  }
-  if( $customer_id != $iRes->customer ) {
-    $changed_params['customer'] = $customer_id;
-  }
-  if( $beds != $iRes->beds){
-    $changed_params['beds'] = $beds;
-  }
-  if( $people != $iRes->people ) {
-    $changed_params['people'] = $people;
-  }
-  if( $space_id != $iRes->space_id ) {
-    $changed_params['space_id'] = $space_id;
+  //  TODO this really should be done as a transaction that can be
+  //  unwound if there is an error
+
+  //  we don't need to verify date change IF they are also trying to change space_id . . .
+  if( $checkin != $iRes->get_checkin() && $space_id == $iRes->get_space_id() ) {
+    //  make sure this reservation is available
+    $is_available = Reservations::check_conflicts_ignore_res( $checkin, $iRes->get_checkout(), $space_id, $iRes->get_id() );
+    $response['ci change available'] = $is_available;
+    if( $is_available ) {
+      $response['set_checkin'] = $iRes->set_checkin( $checkin );
+    } else {
+      array_push( $response['error'], 'checkin change violates availability' );
+      $response['success'] = false;
+    }
   }
 
-  $response['changed_params'] = $changed_params;
-
-
-  
+  //  we don't need to verify date change IF they are also trying to change space_id . . .
+  if( $checkout != $iRes->get_checkout() && $space_id == $iRes->get_space_id() ) {
+    //  make sure this reservation is available
+    $is_available = Reservations::check_conflicts_ignore_res( $iRes->get_checkin(), $checkout, $space_id, $iRes->get_id() );
+    $response['co change available'] = $is_available;
+    if( $is_available ) {
+      $response['set_checkout'] = $iRes->set_checkout( $checkout );
+    } else {
+      array_push( $response['error'], 'checkout change violates availability' );
+      $response['success'] = false;
+    }
+  }
+  if( $customer_id != $iRes->get_customer() ) {
+    $response['set_customer'] = $iRes->set_customer( $customer_id );
+  }
+  if( $beds != $iRes->get_beds() ){
+    $response['set_beds'] = $iRes->set_beds( $beds );
+  }
+  if( $people != $iRes->get_people() ) {
+    $response['set_people'] = $iRes->set_people( $people );
+  }
+  if( $space_id != $iRes->get_space_id() ) {
+    //  if we change the space_id, we also have to change space_code
+    //  BUT the setter handles this 
+    // make sure this reservation is available
+    $is_available = Reservations::check_conflicts_ignore_res( $checkin, $checkout, $space_id, $iRes->get_id() );
+    $response['space_id change available'] = $is_available;
+    if( $is_available ) {
+      $response['set_space_id'] = $iRes->set_space_id( $space_id );
+    } else {
+      array_push( $response['error'], 'space_id change not available' );
+      $response['success'] = false;
+    }
+  }
+  // no matter what happened, return the res as it is now
+  $jRes = new Reservation($res_id);
+  $response['current_res'] = $jRes->to_array();
   print json_encode($response);
 });
 
