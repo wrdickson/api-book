@@ -7,7 +7,7 @@ use \Exception;
 /**
  *  Create reservation
  */
-$f3->route('POST /reservations', function ( $f3 ) {
+$f3->route('POST /reservations/', function ( $f3 ) {
   $perms = ['permission' => 2, 'role' => 'create_reservation' ];
   $f3auth = F3Auth::authorize_token( $f3, $perms);
 
@@ -16,7 +16,8 @@ $f3->route('POST /reservations', function ( $f3 ) {
 
   //  TODO  validate params
   $params_valid = true;
-  
+
+  $response['cid'] = $params->customer->id;
   try {
     $response['create'] = Reservations::create_reservation( $params->checkin,
                                                           $params->checkout,
@@ -33,10 +34,10 @@ $f3->route('POST /reservations', function ( $f3 ) {
     $hRes = new Reservation($new_id);
     $response['history_added'] = $hRes->add_history('Reservation created', $account->id, $account->username);
   }
-
   $response['account'] = $account;
   $response['params'] = $params;
   print json_encode($response);
+  
 });
 
 /**
@@ -118,7 +119,7 @@ $f3->route('POST /reservations/range-ignore-res', function( $f3 ) {
 /**
  *  MODIFY RESERVATION 1
  */
-$f3->route('POST /reservations/', function ( $f3 ) {
+$f3->route('POST /reservations/update/', function ( $f3 ) {
   $perms = [ 'permission' => 3, 'role' => 'modify_reservations' ];
   //  the request should have 'Jwt' property in header with user's token
   //  this throws an error if the token doesn't work OR user doesn't have permission

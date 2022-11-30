@@ -206,9 +206,8 @@ public static function check_conflicts( $start, $end, $space_id ) {
     } catch ( Exception $e ) {
       $pdo->rollBack();
     }
-
     $newRes = new Reservation($resId);
-    $newRes->folio = $folioId;
+    $newRes->set_folio($folioId);
     $newRes->update_to_db();
     $finalRes = new Reservation($resId);
     $response['new_res'] = $finalRes->to_array();
