@@ -3,7 +3,6 @@
 namespace wrdickson\apibook;
 
 use \PDO;
-use \Exception;
 
 Class Reservation{
   public $id;
@@ -15,6 +14,11 @@ Class Reservation{
   public $beds;
   public $folio;
   public $folio_obj;
+  /**
+   * Status:
+   * 0 - Checked in/ in house
+   * 1 - Checked out/ not in house
+   */
   public $status;
   public $history;
   public $notes;
@@ -38,8 +42,8 @@ Class Reservation{
       $iFolio = new Folio( $obj->folio );
       $this->folio_obj = $iFolio->to_array();
       $this->status = $obj->status;
-      $this->history = json_decode($obj->history);
-      $this->notes = json_decode($obj->notes);
+      $this->history = json_decode($obj->history, true);
+      $this->notes = json_decode($obj->notes, true);
       $this->customer = $obj->customer;
       $iCustomer = new Customer($obj->customer);
       $this->customer_obj = $iCustomer->to_array();
@@ -55,24 +59,24 @@ Class Reservation{
   }
 
   public function add_history( $history_text, $user_id, $user_name ){
-    $pdo = DataConnector::get_connection();
     $historyArr = array();
     $historyArr['date'] = date('Y-m-j H:i:s');
-    $historyArr['userId'] = $user_id;
-    $historyArr['username'] = $user_name;
+    $historyArr['account_id'] = $user_id;
+    $historyArr['account_name'] = $user_name;
     $historyArr['text'] = $history_text;
-    $pdo = DataConnector::get_connection();
     $arrpush = array_push($this->history, $historyArr);
+    //$this->history = $arrpush;
     $updateSuccess = $this->update_to_db();
+    return $updateSuccess;
   }
 
   public function checkin(){
-    $this->status = 3;
+    $this->status = 1;
     return $this->update_to_db();
   }
 
   public function checkout(){
-    $this->status = 4;
+    $this->status = 0;
     return $this->update_to_db();
   }
   

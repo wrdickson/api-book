@@ -56,14 +56,14 @@ public static function check_availability_by_dates( $start, $end ){
   return $response;
 }
 
-public static function checkAvailabilityByDatesIgnoreRes($start, $end, $resId){
+public static function check_availability_by_dates_ignore_res($start, $end, $res_id){
   $response = array();
   $pdo = DataConnector::get_connection();
   //first, get all reservations that conflict with those dates
   $stmt = $pdo->prepare("SELECT * FROM reservations WHERE checkin < :end AND checkout > :start AND id != :id");
   $stmt->bindParam(":start", $start, PDO::PARAM_STR);
   $stmt->bindParam(":end", $end, PDO::PARAM_STR);
-  $stmt->bindParam(":id", $resId, PDO::PARAM_INT);
+  $stmt->bindParam(":id", $res_id, PDO::PARAM_INT);
   $stmt->execute();
   //second, get all space_id's that are booked for those dates ($rArr)
   $rArr = array();
@@ -102,8 +102,7 @@ public static function checkAvailabilityByDatesIgnoreRes($start, $end, $resId){
       }
     }
   }
-  $response['availableSpaceIds'] = $availableSpaceIds;
-  return $response;
+  return $availableSpaceIds;
 }
 
 
@@ -137,6 +136,9 @@ public static function check_conflicts( $start, $end, $space_id ){
     };
   }
 
+  /**
+   *  Create Reservation
+   */
   public static function create_reservation( $checkin, $checkout, $customer, $spaceId, $people, $beds ){
     $response = array();
     //  TODO make damn sure there is not a comflict
@@ -153,7 +155,7 @@ public static function check_conflicts( $start, $end, $space_id ){
       //  add to db
       $pdo = DataConnector::get_connection();
       $pdo->beginTransaction();
-      $stmt = $pdo->prepare("INSERT INTO reservations (space_code, space_id, checkin, checkout, customer, people, beds, folio, history, status, notes) VALUES (:sc, :si, :ci, :co, :cus, :ppl, :bds, '0', '{}', '0', '{}')");
+      $stmt = $pdo->prepare("INSERT INTO reservations (space_code, space_id, checkin, checkout, customer, people, beds, folio, history, status, notes) VALUES (:sc, :si, :ci, :co, :cus, :ppl, :bds, '0', '[]', '0', '[]')");
       $stmt->bindParam(":sc", $spaceCode);
       $stmt->bindParam(":si", $spaceId);
       $stmt->bindParam(":ci", $checkin);
@@ -164,7 +166,7 @@ public static function check_conflicts( $start, $end, $space_id ){
       $execute = $stmt->execute();
       $resId = $pdo->lastInsertId();
       $response['execute'] = $execute;
-      $response['newId'] = $resId;
+      $response['new_id'] = $resId;
 
       //  now create the folio
       $folioId = Folios::create_folio( $resId, $customer );
@@ -178,7 +180,7 @@ public static function check_conflicts( $start, $end, $space_id ){
     $newRes->folio = $folioId;
     $newRes->update_to_db();
     $finalRes = new Reservation($resId);
-    $response['newRes'] = $finalRes->to_array();
+    $response['new_res'] = $finalRes->to_array();
     //  return
     return $response;
   }

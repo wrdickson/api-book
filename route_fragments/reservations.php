@@ -2,13 +2,10 @@
 
 namespace wrdickson\apibook;
 
-use wrdickson\apitest\Auth;
 use \Exception;
-use FFI\Exception as FFIException;
 
 /**
- *  CREATE RESERVATION
- * 
+ *  Create reservation
  */
 $f3->route('POST /reservations', function ( $f3 ) {
   $perms = ['permission' => 2, 'role' => 'create_reservation' ];
@@ -17,11 +14,11 @@ $f3->route('POST /reservations', function ( $f3 ) {
   $account = $f3auth['decoded']->account;
   $params = json_decode($f3->get('BODY'));
 
-  //  validate params
-
+  //  TODO  validate params
   $params_valid = true;
+  
   try {
-  $response['create'] = Reservations::create_reservation( $params->checkin,
+    $response['create'] = Reservations::create_reservation( $params->checkin,
                                                           $params->checkout,
                                                           $params->customer->id,
                                                           $params->space_id,
@@ -30,12 +27,21 @@ $f3->route('POST /reservations', function ( $f3 ) {
   } catch (Exception $e) {
     $response['e'] = $e;
   }
+  //  add entry to history
+  if( $response['create']['new_id'] ) {
+    $new_id = $response['create']['new_id'];
+    $hRes = new Reservation($new_id);
+    $response['history_added'] = $hRes->add_history('Reservation created', $account->id, $account->username);
+  }
 
   $response['account'] = $account;
   $response['params'] = $params;
   print json_encode($response);
 });
 
+/**
+ *  Check availability by dates
+ */
 $f3->route('POST /reservations/availability', function ( $f3 ) {
   $perms = [ 'permission' => 0, 'role' => 'get_availability' ];
   //  the request should have 'Jwt' property in header with user's token
@@ -51,6 +57,9 @@ $f3->route('POST /reservations/availability', function ( $f3 ) {
   print json_encode($response);
 });
 
+/**
+ * Check conflicts
+ */
 $f3->route('POST /reservations/conflicts', function ( $f3 ) {
   $perms = [ 'permission' => 1, 'role' => 'check_conflicts' ];
   $f3auth = F3Auth::authorize_token( $f3, $perms );
@@ -66,6 +75,9 @@ $f3->route('POST /reservations/conflicts', function ( $f3 ) {
   print json_encode( $response );
 });
 
+/**
+ *  Get reservations by date range
+ */
 $f3->route('POST /reservations/range', function( $f3 ) {
   $perms = [ 'permission' => 1, 'role' => 'get_reservations' ];
   //  the request should have 'Jwt' property in header with user's token
@@ -82,4 +94,146 @@ $f3->route('POST /reservations/range', function( $f3 ) {
   $response['reservations'] = Reservations::get_reservations_date_range($params->startDate, $params->endDate);
   print json_encode($response);
 });
+
+/**
+ *  Get reservations by date range IGNORING A RESERVATION
+ */
+$f3->route('POST /reservations/range-ignore-res', function( $f3 ) {
+  $perms = [ 'permission' => 1, 'role' => 'get_reservations' ];
+  //  the request should have 'Jwt' property in header with user's token
+  //  this throws an error if the token doesn't work OR user doesn't have permission
+  $f3auth = F3Auth::authorize_token( $f3, $perms );
+  
+  $account = $f3auth['decoded']->account;
+  $params = json_decode($f3->get('BODY'));
+  
+  //  TODO validate dates??
+
+  $response['account'] = $account;
+  $response['params'] = $params;
+  $response['availableSpaceIds'] = Reservations::check_availability_by_dates_ignore_res($params->start_date, $params->end_date, $params->res_id);
+  print json_encode($response);
+});
+
+/**
+ *  MODIFY RESERVATION 1
+ */
+$f3->route('POST /reservations/', function ( $f3 ) {
+  $perms = [ 'permission' => 3, 'role' => 'modify_reservations' ];
+  //  the request should have 'Jwt' property in header with user's token
+  //  this throws an error if the token doesn't work OR user doesn't have permission
+  $f3auth = F3Auth::authorize_token( $f3, $perms );
+
+  $account = $f3auth['decoded']->account;
+  $params = json_decode($f3->get('BODY'));
+  $resObj = $params->res_obj;
+
+  $response['auth'] = $f3auth;
+  $response['params'] = $params;
+
+  //  TODO validate params
+  
+  //  create local param copies
+  $checkin = $resObj->checkin;
+  $checkout = $resObj->checkout;
+  $customer_id = $resObj->customer;
+  $people = $resObj->people;
+  $beds = $resObj->beds;
+  $space_id = $resObj->space_id;
+  $res_id = $resObj->res_id;
+
+
+  $iRes = new Reservation($res_id);
+  $response['rid'] = $res_id;
+  $iRes = new Reservation($res_id);
+  $iResArray = $iRes->to_array();
+  $response['origResArray'] = $iResArray;
+
+  //  go through the params and see if the properties have changed
+  //  create an array to hold the params that have changed
+  $changed_params = array();
+  //  test the params to see if they have changed
+  //  beds
+  if( $checkin != $iRes->checkin ) {
+    $changed_params['checkin'] = $checkin;
+  }
+  if( $checkout != $iRes->checkout ) {
+    $changed_params['checkout'] = $checkout;
+  }
+  if( $customer_id != $iRes->customer ) {
+    $changed_params['customer'] = $customer_id;
+  }
+  if( $beds != $iRes->beds){
+    $changed_params['beds'] = $beds;
+  }
+  if( $people != $iRes->people ) {
+    $changed_params['people'] = $people;
+  }
+  if( $space_id != $iRes->space_id ) {
+    $changed_params['space_id'] = $space_id;
+  }
+
+  $response['changed_params'] = $changed_params;
+
+
+  
+  print json_encode($response);
+});
+
+
+/**
+ *  Reservation checkin
+ */
+$f3->route('POST /reservations/checkin', function( $f3 ) {
+  $perms = [ 'permission' => 3, 'role' => 'manipulate_reservations' ];
+  //  the request should have 'Jwt' property in header with user's token
+  //  this throws an error if the token doesn't work OR user doesn't have permission
+  $f3auth = F3Auth::authorize_token( $f3, $perms );
+
+    //  TODO validate params
+
+  $account = $f3auth['decoded']->account;
+  $params = json_decode($f3->get('BODY'));
+
+  $res_id = $params->res_id;
+  $iRes = new Reservation($res_id);
+
+  $response['account'] = $account;
+  $response['res_id'] = $res_id;
+  $response['reservation_before'] = $iRes->to_array();
+  $response['checkin'] = $iRes->checkin();
+  $response['add_history'] = $iRes->add_history("Checked in", $account->id, $account->username);
+  $response['reservation_after_checkin'] = $iRes->to_array();
+
+  print json_encode($response);
+});
+
+/**
+ *  Reservation checkout
+ */
+$f3->route('POST /reservations/checkout', function( $f3 ) {
+  $perms = [ 'permission' => 3, 'role' => 'manipulate_reservations' ];
+  //  the request should have 'Jwt' property in header with user's token
+  //  this throws an error if the token doesn't work OR user doesn't have permission
+  $f3auth = F3Auth::authorize_token( $f3, $perms );
+
+    //  TODO validate params
+
+  $account = $f3auth['decoded']->account;
+  $params = json_decode($f3->get('BODY'));
+
+  $res_id = $params->res_id;
+  $iRes = new Reservation($res_id);
+
+  $response['account'] = $account;
+  $response['res_id'] = $res_id;
+  $response['reservation_before'] = $iRes->to_array();
+  $response['checkout'] = $iRes->checkout();
+  $response['add_history'] = $iRes->add_history("Checked out", $account->id, $account->username);
+  $response['reservation_after_checkout'] = $iRes->to_array();
+  
+
+  print json_encode($response);
+});
+
 
