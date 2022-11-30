@@ -21,11 +21,6 @@ $f3->route('POST /customers/', function ( $f3 ) {
   $lastName = $params->lastName;
   $email = $params->email;
   $phone = $params->phone;
-  $address1 = $params->address1;
-  $address2 = $params->address2;
-  $city = $params->city;
-  $region = $params->region;
-  $postal_code = $params->postalCode;
 
   //  TODO validate inputs
 
