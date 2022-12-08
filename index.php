@@ -15,6 +15,10 @@ require 'lib/F3Auth.php';
 require 'lib/RootSpaces.php';
 require 'lib/RootSpace.php';
 require 'lib/SpaceTypes.php';
+require 'lib/TaxType.php';
+require 'lib/TaxTypes.php';
+require 'lib/SaleTypes.php';
+require 'lib/SaleTypeGroups.php';
 
 require 'vendor/autoload.php';
 
@@ -40,5 +44,14 @@ require 'route_fragments/customers.php';
 
 //  handles SpaceTypes
 require 'route_fragments/space_types.php';
+
+//  handles TaxTypes
+require 'route_fragments/tax_types.php';
+
+// handles SaleTypes
+require 'route_fragments/sale_types.php';
+
+// handles SaleTypeGroups
+require 'route_fragments/sale_type_groups.php';
 
 $f3->run();

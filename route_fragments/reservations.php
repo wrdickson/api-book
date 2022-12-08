@@ -15,6 +15,8 @@ $f3->route('POST /reservations/', function ( $f3 ) {
   $params = json_decode($f3->get('BODY'));
 
   //  TODO  validate params
+
+  
   $params_valid = true;
 
   $response['cid'] = $params->customer->id;
