@@ -194,6 +194,7 @@ public static function check_conflicts( $start, $end, $space_id ) {
       $stmt->bindParam(":cus", $customer);
       $stmt->bindParam(":ppl", $people);
       $stmt->bindParam(":bds", $beds);
+
       $execute = $stmt->execute();
       $resId = $pdo->lastInsertId();
       $response['execute'] = $execute;
@@ -204,13 +205,14 @@ public static function check_conflicts( $start, $end, $space_id ) {
 
       $pdo->commit();
     } catch ( Exception $e ) {
+      $response['rollback'] = $e;
       $pdo->rollBack();
     }
     $newRes = new Reservation($resId);
     $newRes->set_folio($folioId);
     $newRes->update_to_db();
     $finalRes = new Reservation($resId);
-    $response['new_res'] = $finalRes->to_array();
+    $response['new_res_before_history'] = $finalRes->to_array();
     //  return
     return $response;
   }

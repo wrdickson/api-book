@@ -20,6 +20,7 @@ $f3->route('POST /reservations/', function ( $f3 ) {
   $params_valid = true;
 
   $response['cid'] = $params->customer->id;
+  
   try {
     $response['create'] = Reservations::create_reservation( $params->checkin,
                                                           $params->checkout,
@@ -31,11 +32,12 @@ $f3->route('POST /reservations/', function ( $f3 ) {
     $response['e'] = $e;
   }
   //  add entry to history
-  if( $response['create']['new_id'] ) {
+  if( $response['create'] && $response['create']['new_id'] ) {
     $new_id = $response['create']['new_id'];
     $hRes = new Reservation($new_id);
     $response['history_added'] = $hRes->add_history('Reservation created', $account->id, $account->username);
   }
+  //  reinstantiate the res
   $response['account'] = $account;
   $response['params'] = $params;
   print json_encode($response);
