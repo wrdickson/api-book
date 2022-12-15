@@ -21,8 +21,6 @@ Class Reservation{
   private $beds;
   // $folio int
   private $folio;
-  // folio_obj is a json string
-  private $folio_obj;
   /**
    * Status:
    * 0 - Checked in/ in house
@@ -94,8 +92,6 @@ Class Reservation{
       $this->people = $obj->people;
       $this->beds = $obj->beds;
       $this->folio = $obj->folio;
-      $iFolio = new Folio( $obj->folio );
-      $this->folio_obj = $iFolio->to_array();
       $this->status = $obj->status;
       $this->history = json_decode($obj->history, true);
       $this->notes = json_decode($obj->notes, true);
@@ -145,7 +141,6 @@ Class Reservation{
     $arr['people'] = $this->people;
     $arr['beds'] = $this->beds;
     $arr['folio'] = $this->folio;
-    $arr['folio_obj'] = $this->folio_obj;
     $arr['status'] = $this->status;
     $arr['history'] = $this->history;
     $arr['notes'] = $this->notes;
@@ -218,9 +213,6 @@ Class Reservation{
           $iCustomer = new Customer($obj->customer);
           $r['customer_obj'] = $iCustomer->to_array();
         }
-        $folio = new Folio( $r['folio'] );
-        $r['folio_obj'] = $folio->to_array();
-
         return $r;
   }
 
@@ -269,9 +261,6 @@ Class Reservation{
   }
   public function get_folio () {
     return $this->folio;
-  }
-  public function get_folio_obj () {
-    return $this->folio_obj;
   }
   public function get_status () {
     return $this->status;

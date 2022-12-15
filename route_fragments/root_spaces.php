@@ -2,8 +2,6 @@
 
 namespace wrdickson\apibook;
 
-$f3 = \Base::instance();
-
 //  CREATE ROOT SPACE
 //  note the weird url . . . we used POST to require auth for a psuedo get
 $f3->route('POST /root-spaces-create', function ( $f3 ) {

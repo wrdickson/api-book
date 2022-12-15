@@ -2,8 +2,6 @@
 
 namespace wrdickson\apibook;
 
-$f3 = \Base::instance();
-
 /** 
  * CREATE CUSTOMER
  * This is hamburger bullshit, we are only creating based on 

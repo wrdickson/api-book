@@ -4,8 +4,6 @@ namespace wrdickson\apibook;
 
 use wrdickson\apitest\Auth;
 
-$f3 = \Base::instance();
-
 /**
  * LOGIN
  * 

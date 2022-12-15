@@ -3,6 +3,7 @@
 namespace wrdickson\apibook;
 
 require 'config/config.php';
+require 'lib/Validate.php';
 require 'lib/DataConnector.php';
 require 'lib/Reservations.php';
 require 'lib/Reservation.php';
@@ -19,6 +20,10 @@ require 'lib/TaxType.php';
 require 'lib/TaxTypes.php';
 require 'lib/SaleTypes.php';
 require 'lib/SaleTypeGroups.php';
+require 'lib/PaymentTypes.php';
+require 'lib/Payments.php';
+require 'lib/Invoices.php';
+require 'lib/SaleItems.php';
 
 require 'vendor/autoload.php';
 
@@ -53,5 +58,14 @@ require 'route_fragments/sale_types.php';
 
 // handles SaleTypeGroups
 require 'route_fragments/sale_type_groups.php';
+
+//  handles PaymentTypes
+require 'route_fragments/payment_types.php';
+
+//  handles Payments [!]
+require 'route_fragments/payments.php';
+
+// handles Folios
+require 'route_fragments/folios.php';
 
 $f3->run();
